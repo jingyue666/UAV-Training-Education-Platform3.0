@@ -88,4 +88,4 @@ for v in demo_videos:
 
 conn.commit()
 conn.close()
-print("✅ 数据库初始化完成，已预存四大模块示范视频")
+print("✅ 数据库初始化完成")
