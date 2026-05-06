@@ -1,10 +1,10 @@
 import streamlit as st
 import sqlite3
 import os
+from modules.profile import add_watch_history
 
 DB_PATH = os.path.join("data", "drone_platform.db")
 
-# 1. 先定义封面（这次我把所有封面写死在代码里，保证不会 undefined）
 DEFAULT_COVERS = {
     "基础理论模块": "https://images.unsplash.com/photo-1473968512647-3e447244af8f?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
     "实操技能模块": "https://images.unsplash.com/photo-1527977966376-1c8408f9f108?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80",
@@ -15,14 +15,12 @@ DEFAULT_COVERS = {
 MODULES = list(DEFAULT_COVERS.keys())
 
 def show():
-    # 模块按钮
     cols = st.columns(4)
     for i, name in enumerate(MODULES):
         with cols[i]:
             if st.button(name, key=f"mod_btn_{i}", use_container_width=True):
                 st.session_state.mod = name
 
-    # 默认模块
     if "mod" not in st.session_state:
         st.session_state.mod = MODULES[0]
 
@@ -30,32 +28,29 @@ def show():
     st.subheader(current)
     st.divider()
 
-    # 加载视频
     try:
         con = sqlite3.connect(DB_PATH)
         videos = con.execute("SELECT title, cover, url, level FROM videos WHERE category=?", (current,)).fetchall()
         con.close()
 
         if not videos:
-            st.info("该模块暂无视频课程，敬请期待。")
+            st.info("暂无视频")
             return
 
-        # 3列卡片 + 封面图
         cols = st.columns(3)
         for i, (title, cover, url, level) in enumerate(videos):
             with cols[i % 3]:
-                # 优先用数据库里的封面，没有就用当前模块的专属默认封面
                 if cover and cover.strip() != "":
                     st.image(cover, use_column_width=True)
                 else:
                     st.image(DEFAULT_COVERS[current], use_column_width=True)
-                
+
                 st.markdown(f"**{title}**")
                 st.caption(f"难度：{level}")
-                if st.button("播放", key=f"play_btn_{i}", use_container_width=True):
+                if st.button("播放", key=f"p{i}", use_container_width=True):
                     st.session_state.vurl = url
+                    add_watch_history(title, current)
 
-        # 播放区
         if "vurl" in st.session_state and st.session_state.vurl:
             st.divider()
             st.video(st.session_state.vurl)
