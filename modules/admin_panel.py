@@ -5,10 +5,8 @@ import os
 DB_PATH = os.path.join("data", "drone_platform.db")
 
 def admin_panel():
-    st.header("管理者后台管理中心")
-    st.divider()
+    st.header("管理者后台")
     tabs = st.tabs(["课程管理", "视频管理", "学员管理"])
-    
     with tabs[0]:
         course_manage()
     with tabs[1]:
@@ -20,17 +18,15 @@ def course_manage():
     st.subheader("课程管理")
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    
     with st.form("add_course"):
         title = st.text_input("课程名称")
         level = st.selectbox("难度", ["初级", "中级", "高级"])
         price = st.number_input("价格", 0.0)
-        if st.form_submit_button("新增课程"):
+        if st.form_submit_button("新增"):
             c.execute("INSERT INTO courses (title, level, price) VALUES (?,?,?)",
                       (title, level, price))
             conn.commit()
-            st.success("课程添加成功")
-    
+            st.success("添加成功")
     st.dataframe(conn.execute("SELECT * FROM courses").fetchall(), use_container_width=True)
     conn.close()
 
@@ -38,7 +34,6 @@ def video_manage():
     st.subheader("视频管理")
     conn = sqlite3.connect(DB_PATH)
     c = conn.cursor()
-    
     with st.expander("新增视频"):
         with st.form("add_video"):
             title = st.text_input("视频标题")
@@ -48,15 +43,14 @@ def video_manage():
                 "行业应用模块",
                 "商业运营模块"
             ])
-            level = st.selectbox("难度", ["初级", "中级", "高级"])
+            level = st.selectbox("难度", ["初级","中级","高级"])
             url = st.text_input("视频链接")
             cover = st.text_input("封面链接")
             if st.form_submit_button("发布"):
                 c.execute("INSERT INTO videos (title, category, level, url, cover) VALUES (?,?,?,?,?)",
                           (title, category, level, url, cover))
                 conn.commit()
-                st.success("视频发布成功")
-    
+                st.success("发布成功")
     videos = c.execute("SELECT id, title, category, level FROM videos ORDER BY created_at DESC").fetchall()
     for vid, title, cat, lv in videos:
         col1, col2, col3 = st.columns([3,1,1])
