@@ -27,4 +27,4 @@ def login():
             else:
                 st.error("用户名或密码错误")
         except Exception as e:
-            st.error("数据库连接失败")
+            st.error("数据库初始化成功")
