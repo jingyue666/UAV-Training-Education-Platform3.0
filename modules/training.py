@@ -43,9 +43,9 @@ def show():
         for i, (title, cover, url, level) in enumerate(videos):
             with cols[i % 3]:
                 if cover and cover.strip() != "":
-                    st.image(cover, use_column_width=True)
+                    st.image(cover, width="stretch")
                 else:
-                    st.image(DEFAULT_COVERS[current], use_column_width=True)
+                    st.image(DEFAULT_COVERS[current], width="stretch")
 
                 st.markdown(f"**{title}**")
                 st.caption(f"难度：{level}")
